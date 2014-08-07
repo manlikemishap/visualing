@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html>
 <meta charset="utf-8">
+<head>
 <title>Adjacency Matrix</title>
 <style>
 
-@import url(../style.css?aea6f0a);
+/*@import url(../style.css?aea6f0a);*/
+
+body {
+  /*border-left: 50px;*/
+  margin-left: 200px;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+}
 
 .background {
   fill: #eee;
@@ -18,15 +25,20 @@ text.active {
   fill: red;
 }
 
+text {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+}
+
 </style>
 <script type="text/javascript" src="d3.v3.js"></script>
-
+</head>
+<body>
 <header>
 </header>
 
-<h1><i>Hobby Lobby</i> Adjacency Matrix</h1>
+<h1>Gaza Vocabulary Adjacency Matrix</h1>
 
-<aside style="margin-top:80px;">
+<aside style="margin-top:10px;">
 <p>Order: <select id="order">
   <option value="name">by Name</option>
   <option value="count">by Frequency</option>
@@ -36,9 +48,12 @@ text.active {
 
 <script type="text/javascript">
 
-var margin = {top: 80, right: 0, bottom: 10, left: 80},
-    width = 720,
-    height = 720;
+var margin = {top: 80, right: 80, bottom: 10, left: 100},
+    width = 1000,
+    height = 1000;
+
+var focus_color = "007f0e", 
+    base_color = "ff7f0e";
 
 var x = d3.scale.ordinal().rangeBands([0, width]),
     z = d3.scale.linear().domain([0, 4]).clamp(true),
@@ -119,7 +134,10 @@ d3.json("hobby_lobby_story_50.json", function(data) {
       .attr("y", x.rangeBand() / 2)
       .attr("dy", ".32em")
       .attr("text-anchor", "start")
-      .text(function(d, i) { return nodes[i].name; });
+      .text(function(d, i) { return nodes[i].name; })
+      .attr("transform", function(d, i) {
+               return "translate(15, 0)rotate(45)";
+      });
 
   function row(row) {
     var cell = d3.select(this).selectAll(".cell")
@@ -138,10 +156,27 @@ d3.json("hobby_lobby_story_50.json", function(data) {
   function mouseover(p) {
     d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
     d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
+
+    group = d3.select(this.parentNode);
+    group.selectAll("rect").style("fill", "#007f0e");
+
+    d3.selectAll(".row")
+      .attr("fill-opacity", function(d, i) { 
+        if(i == p.y) {
+          window.status=p.y + "+ ";
+          return z(d.z) - 100;
+        }
+      });
+
+    d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
+    
+    // window.status="(" + p.x + "/" + p.y + ")";
   }
 
   function mouseout() {
     d3.selectAll("text").classed("active", false);
+    group = d3.select(this.parentNode);
+    group.selectAll("rect").style("fill", function(d) { return nodes[d.x].group == nodes[d.y].group ? c(nodes[d.x].group) : null; })
   }
 
   d3.select("#order").on("change", function() {
@@ -173,3 +208,4 @@ d3.json("hobby_lobby_story_50.json", function(data) {
 });
 
 </script>
+</body>
