@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <head>
 <title>Adjacency Matrix</title>
+<!-- <link rel="stylesheet" href="d3.slider.css" />   -->
 <style>
 
 /*@import url(../style.css?aea6f0a);*/
@@ -29,10 +30,17 @@ text {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
 }
 
+h1 {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+  font-weight: 100;
+}
+
 </style>
 <script type="text/javascript" src="d3.v3.js"></script>
+<!-- <script src="d3.slider.js"></script> -->
 </head>
 <body>
+
 <header>
 </header>
 
@@ -46,6 +54,16 @@ text {
 </select>
 </aside>
 
+<div id="slider1"/>
+
+<script type="text/javascript">
+  // d3.select('#slider1').call(
+  //   d3.slider().value(100).on("slide", function(evt, value) {
+  //     z = d3.scale.linear().domain([value, 3604]).clamp(true);
+  //   })
+  // );
+</script>
+
 <script type="text/javascript">
 
 var margin = {top: 80, right: 80, bottom: 10, left: 100},
@@ -55,8 +73,10 @@ var margin = {top: 80, right: 80, bottom: 10, left: 100},
 var focus_color = "007f0e", 
     base_color = "ff7f0e";
 
+# TODO: Use metadata output from script to set viz parameters (e.g. linear scale range)
+
 var x = d3.scale.ordinal().rangeBands([0, width]),
-    z = d3.scale.linear().domain([0, 4]).clamp(true),
+    z = d3.scale.linear().domain([400, 6000]).clamp(true),
     c = d3.scale.category10().domain(d3.range(10));
 
 var svg = d3.select("body").append("svg")
@@ -66,7 +86,7 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("hobby_lobby_story_50.json", function(data) {
+d3.json("gaza_matrix.json", function(data) {
   var matrix = [],
       nodes = data.nodes,
       n = nodes.length;
@@ -98,7 +118,8 @@ d3.json("hobby_lobby_story_50.json", function(data) {
   // The default sort order.
   x.domain(orders.name);
 
-  svg.append("rect")
+  // svg.append("rect")
+  svg.append("a").attr("xlink:href", 'https://dashboard.mediameter.org/#demo-query/["{~%20controversy:720%20}%20AND%20gaza%20AND%20israel"]/[{"sets":[8875027]}]/["2014-07-01"]/["2014-08-06"]').append("rect")
       .attr("class", "background")
       .attr("width", width)
       .attr("height", height);
@@ -142,7 +163,8 @@ d3.json("hobby_lobby_story_50.json", function(data) {
   function row(row) {
     var cell = d3.select(this).selectAll(".cell")
         .data(row.filter(function(d) { return d.z; }))
-      .enter().append("rect")
+      .enter().append("a").attr("xlink:href", 'https://dashboard.mediameter.org/#demo-query/["{~%20controversy:720%20}%20AND%20gaza%20AND%20israel"]/[{"sets":[8875027]}]/["2014-07-01"]/["2014-08-06"]')
+        .append("rect")
         .attr("class", "cell")
         .attr("x", function(d) { return x(d.x); })
         .attr("width", x.rangeBand())
@@ -187,7 +209,7 @@ d3.json("hobby_lobby_story_50.json", function(data) {
   function order(value) {
     x.domain(orders[value]);
 
-    var t = svg.transition().duration(2500);
+    var t = svg.transition().duration(1000);
 
     t.selectAll(".row")
         .delay(function(d, i) { return x(i) * 4; })
